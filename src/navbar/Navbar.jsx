@@ -1,4 +1,4 @@
-import Main from "../main/Main.jsx";
+
 const Sidebar = ({
   notes,
   onAddNote,

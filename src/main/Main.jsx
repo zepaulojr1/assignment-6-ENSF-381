@@ -56,11 +56,7 @@ const Main = ({ activeNote, onUpdateNote, onDeleteNote }) => {
     setIsEditing(false);
   };
 
-  const handleDeleteNote = (id) => {
-    if (window.confirm("Are you sure you want to delete this note?")) {
-      onDeleteNote(id);
-    }
-  };
+  
 
   if (!activeNote) return <div className="no-active-note">No Active Note</div>;
 
