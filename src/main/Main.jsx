@@ -2,11 +2,7 @@ import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 const Main = ({ activeNote, onUpdateNote, onDeleteNote }) => {
-  const [isBold, setIsBold] = useState(false);
-  const [isItalic, setIsItalic] = useState(false);
-  const [isUnderline, setIsUnderline] = useState(false);
-  const [isBullet, setIsBullet] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  
 
   const onEditField = (field, value) => {
     onUpdateNote({
