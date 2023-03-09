@@ -10,6 +10,7 @@ function App() {
     localStorage.notes ? JSON.parse(localStorage.notes) : []
   );
   const [activeNote, setActiveNote] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false); // Add this line
 
   useEffect(() => {
     localStorage.setItem("notes", JSON.stringify(notes));
@@ -49,13 +50,14 @@ function App() {
 
   return (
     <div className="App">
-      
       <Navbar
         notes={notes}
         onAddNote={onAddNote}
         onDeleteNote={onDeleteNote}
         activeNote={activeNote}
         setActiveNote={setActiveNote}
+        showSidebar={showSidebar} // Add this line
+        setShowSidebar={setShowSidebar} // Add this line
       />
       <Main activeNote={getActiveNote()} onUpdateNote={onUpdateNote} />
     </div>

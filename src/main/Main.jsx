@@ -1,8 +1,12 @@
+import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { useEffect, useRef } from "react";
 
-const Main = ({ activeNote, onUpdateNote }) => {
-  const editorRef = useRef(null);
+const Main = ({ activeNote, onUpdateNote, onDeleteNote }) => {
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [isUnderline, setIsUnderline] = useState(false);
+  const [isBullet, setIsBullet] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const onEditField = (field, value) => {
     onUpdateNote({
@@ -11,10 +15,6 @@ const Main = ({ activeNote, onUpdateNote }) => {
       lastModified: Date.now(),
     });
   };
-
-  useEffect(() => {
-    editorRef.current.focus();
-  }, []);
 
   const onBoldClick = () => {
     const newBody = `**${activeNote.body}**`;
@@ -27,15 +27,82 @@ const Main = ({ activeNote, onUpdateNote }) => {
   };
 
   const onUnderlineClick = () => {
-    const newBody = `<u>${activeNote.body}</u>`;
+    const newBody = `<Text style={styles.underline}>${activeNote.body}</Text>`;
     onEditField("body", newBody);
+  };
+
+  const toggleBullet = () => {
+    setIsBullet(!isBullet);
+  };
+
+  const handleBulletList = (event) => {
+    event.preventDefault();
+    const textArea = event.target;
+    const start = textArea.selectionStart;
+    const end = textArea.selectionEnd;
+    const selectedText = activeNote.body.substring(start, end);
+    const textBefore = activeNote.body.substring(0, start);
+    const textAfter = activeNote.body.substring(end);
+    const bulletText = `- ${selectedText}`;
+    const updatedText = `${textBefore}${bulletText}${textAfter}`;
+    onEditField("body", updatedText);
+  };
+
+  const handleEditNote = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+  };
+
+  const handleDeleteNote = (id) => {
+    if (window.confirm("Are you sure you want to delete this note?")) {
+      onDeleteNote(id);
+    }
   };
 
   if (!activeNote) return <div className="no-active-note">No Active Note</div>;
 
+  const boldMark = isBold ? "**" : "";
+  const italicMark = isItalic ? "*" : "";
+  const underlineMark = isUnderline ? "__" : "";
+  const bulletMark = isBullet ? "- " : "";
+
   return (
     <div className="app-main">
       <div className="app-main-note-edit">
+        {!isEditing && (
+          <button className="edit-note" onClick={handleEditNote}>
+            Edit
+          </button>
+        )}
+        {isEditing && (
+          <button className="cancel-edit" onClick={handleCancelEdit}>
+            Cancel
+          </button>
+        )}
+        <div className="note-editor-buttons">
+          <button className="Bold" onClick={onBoldClick}>
+            B
+          </button>
+          <button className="Italic" onClick={onItalicClick}>
+            I
+          </button>
+          <button className="Underline" onClick={onUnderlineClick}>
+            U
+          </button>
+          <button
+            className="Bullet"
+            onClick={toggleBullet}
+            style={{ fontWeight: isBullet ? "bold" : "normal" }}
+          >
+            &#8226;
+          </button>
+        </div>
+        
+       
+
         <input
           type="text"
           id="title"
@@ -43,30 +110,27 @@ const Main = ({ activeNote, onUpdateNote }) => {
           value={activeNote.title}
           onChange={(e) => onEditField("title", e.target.value)}
           autoFocus
+          disabled={!isEditing}
         />
-        <div className="editor-buttons">
-          <button className="editor-button" onClick={onBoldClick}>
-            <b>B</b>
-          </button>
-          <button className="editor-button" onClick={onItalicClick}>
-            <i>I</i>
-          </button>
-          <button className="editor-button" onClick={onUnderlineClick}>
-            <u>U</u>
-          </button>
-        </div>
         <textarea
           id="body"
           placeholder="Write your note here..."
           value={activeNote.body}
           onChange={(e) => onEditField("body", e.target.value)}
-          ref={editorRef}
+          onKeyDown={(e) => {
+            if (e.key === "Press Tab") {
+              e.preventDefault();
+              handleBulletList(e);
+            }
+          }}
+          disabled={!isEditing}
         />
+
       </div>
       <div className="app-main-note-preview">
         <h1 className="preview-title">{activeNote.title}</h1>
         <ReactMarkdown className="markdown-preview">
-          {activeNote.body}
+          {`${boldMark}${italicMark}${underlineMark}${bulletMark}${activeNote.body}`}
         </ReactMarkdown>
       </div>
     </div>
